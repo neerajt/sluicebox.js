@@ -1,0 +1,23 @@
+{
+  "name": "tagthejoads",
+  "version": "0.0.0",
+  "description": "joads joads joads",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/People-Watching/tagthejoads.git"
+  },
+  "author": "neeraj",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/People-Watching/tagthejoads/issues"
+  },
+  "homepage": "https://github.com/People-Watching/tagthejoads",
+  "dependencies": {
+    "twitter": "^0.2.9"
+  }
+}
