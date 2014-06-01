@@ -36,20 +36,28 @@
     req.write(strjoad);
     req.end();
 
-//parse a joad
-function makeajoad(data){
-  var joad = {};
-  joad['story'] = (data.text);
-  joad['imageUrl'] = _.pluck(data.entities.media, 'media_url')[0];
-  joad['location'] = {'time':(new Date(data.created_at)).toISOString(), 'latitude':5.0, 'longitude':23.0};
-  joad['tags'] = ['joads'];
-  // joad['tags'] = _.pluck(data.entities.hashtags[0], 'text');
-  var strjoad = JSON.stringify(joad);
-  console.log(joad);
-  console.log(strjoad);
-  console.log(strjoad.length);
-  return strjoad;
-}
+//make a joad
+  function makeajoad(data){
+    var joad = {};
+    joad['story'] = (data.text);
+    joad['imageUrl'] = _.pluck(data.entities.media, 'media_url')[0];
+    joad['location'] = {'time':(new Date(data.created_at)).toISOString(), 'latitude':5.0, 'longitude':23.0};
+    joad['tags'] = ['joads'];
+    // joad['tags'] = _.pluck(data.entities.hashtags[0], 'text');
+    var strjoad = JSON.stringify(joad);
+    console.log(joad);
+    console.log(strjoad);
+    console.log(strjoad.length);
+    return strjoad;
+  }
+
+//write a joad
+  function writeajoad(strjoad){
+    $jsonFile = fopen('myJoad.json','w+');
+    fwrite($jsonFile, strjoad);
+    fclose($jsonFile);
+  }
+
 twit.stream('statuses/filter', {track:'selfie'}, function(stream) {
     stream.on('data', function(data) {
         if(!data.retweeted_status){
@@ -57,6 +65,7 @@ twit.stream('statuses/filter', {track:'selfie'}, function(stream) {
             // options.headers['Content-Length'] = strjoad.length;
             strjoad = makeajoad(data);
             sendtoapi(strjoad);
+            writeajoad(strjoad);
           };
         };
     });
