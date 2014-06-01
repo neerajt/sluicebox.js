@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/People-Watching/tagthejoads",
   "dependencies": {
-    "twitter": "^0.2.9"
+    "twitter": "^0.2.9",
+    "lodash": "^2.4.1"
   }
 }
