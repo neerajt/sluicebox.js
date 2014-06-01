@@ -2,7 +2,8 @@
   var util = require('util'),
       twitter = require('twitter'),
       _ = require('lodash'),
-      http = require("http");
+      http = require("http"),
+      fs = require('fs');
   var twit = new twitter({
       consumer_key: 'Uui4NrkShX9x8zFoAENiggPlN',
       consumer_secret: 'eIVwXceI57fJw3RWBxCOQRbFlEYS2W7zL7Q9P9l6yUgQxJzFt9',
@@ -26,7 +27,6 @@
         console.log('BODY: ' + chunk);
       });
     });
-  }
 
     req.on('error', function(e) {
       console.log('problem with request: ' + e.message);
@@ -35,7 +35,7 @@
     // write data to request body
     req.write(strjoad);
     req.end();
-
+};
 //make a joad
   function makeajoad(data){
     var joad = {};
@@ -45,7 +45,6 @@
     joad['tags'] = ['joads'];
     // joad['tags'] = _.pluck(data.entities.hashtags[0], 'text');
     var strjoad = JSON.stringify(joad);
-    console.log(joad);
     console.log(strjoad);
     console.log(strjoad.length);
     return strjoad;
@@ -53,9 +52,13 @@
 
 //write a joad
   function writeajoad(strjoad){
-    $jsonFile = fopen('myJoad.json','w+');
-    fwrite($jsonFile, strjoad);
-    fclose($jsonFile);
+  fs.appendFile("myJoads.txt", strjoad + "\n", function(err) {
+    if(err) {
+        console.log(err);
+    } else {
+        console.log("The file was saved!");
+    }
+  });
   }
 
 twit.stream('statuses/filter', {track:'selfie'}, function(stream) {
