@@ -1,53 +1,62 @@
-var util = require('util'),
-    twitter = require('twitter'),
-    _ = require('lodash'),
-    http = require("http");
-var twit = new twitter({
-    consumer_key: 'Uui4NrkShX9x8zFoAENiggPlN',
-    consumer_secret: 'eIVwXceI57fJw3RWBxCOQRbFlEYS2W7zL7Q9P9l6yUgQxJzFt9',
-    access_token_key: '140177155-9OzRTJSd7GpW1P7WtInEqiIkUaEQ803hJ8aVDjqf',
-    access_token_secret: 'DM8OhkJPSObjsO2At0935PiJlizNqSJEIExYVAo7cHnp2'
-});
-var options = {
-  host: '192.168.0.106',
-  port: 3000,
-  path: '/people',
-  method: 'POST',
-  headers: {'Content-Type': 'application/json'}
-};
+//setting shit up
+  var util = require('util'),
+      twitter = require('twitter'),
+      _ = require('lodash'),
+      http = require("http");
+  var twit = new twitter({
+      consumer_key: 'Uui4NrkShX9x8zFoAENiggPlN',
+      consumer_secret: 'eIVwXceI57fJw3RWBxCOQRbFlEYS2W7zL7Q9P9l6yUgQxJzFt9',
+      access_token_key: '140177155-9OzRTJSd7GpW1P7WtInEqiIkUaEQ803hJ8aVDjqf',
+      access_token_secret: 'DM8OhkJPSObjsO2At0935PiJlizNqSJEIExYVAo7cHnp2'
+  });
+  var options = {
+    host: '192.168.0.106',
+    port: 3000,
+    path: '/people',
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'}
+  };
 
+  function sendtoapi(strjoad){
+    var req = http.request(options, function(res) {
+      console.log('STATUS: ' + res.statusCode);
+      console.log('HEADERS: ' + JSON.stringify(res.headers));
+      res.setEncoding('utf8');
+      res.on('data', function (chunk) {
+        console.log('BODY: ' + chunk);
+      });
+    });
+  }
+
+    req.on('error', function(e) {
+      console.log('problem with request: ' + e.message);
+    });
+
+    // write data to request body
+    req.write(strjoad);
+    req.end();
+
+//parse a joad
+function makeajoad(data){
+  var joad = {};
+  joad['story'] = (data.text);
+  joad['imageUrl'] = _.pluck(data.entities.media, 'media_url')[0];
+  joad['location'] = {'time':(new Date(data.created_at)).toISOString(), 'latitude':5.0, 'longitude':23.0};
+  joad['tags'] = ['joads'];
+  // joad['tags'] = _.pluck(data.entities.hashtags[0], 'text');
+  var strjoad = JSON.stringify(joad);
+  console.log(joad);
+  console.log(strjoad);
+  console.log(strjoad.length);
+  return strjoad;
+}
 twit.stream('statuses/filter', {track:'selfie'}, function(stream) {
     stream.on('data', function(data) {
         if(!data.retweeted_status){
-                var joad = {};
           if(data.entities.media && !(_.isUndefined(_.pluck(data.entities.media, 'media_url')))) {
-            joad['story'] = (data.text);
-            joad['imageUrl'] = _.pluck(data.entities.media, 'media_url')[0];
-            joad['location'] = {'time':(new Date(data.created_at)).toISOString(), 'latitude':5.0, 'longitude':23.0};
-            joad['tags'] = ['joads'];
-            // joad['tags'] = _.pluck(data.entities.hashtags[0], 'text');
-            var strjoad = JSON.stringify(joad);
-            console.log(joad);
-            console.log(strjoad);
-            console.log(strjoad.length);
             // options.headers['Content-Length'] = strjoad.length;
-            var req = http.request(options, function(res) {
-              console.log('STATUS: ' + res.statusCode);
-              console.log('HEADERS: ' + JSON.stringify(res.headers));
-              res.setEncoding('utf8');
-              res.on('data', function (chunk) {
-                console.log('BODY: ' + chunk);
-              });
-            });
-
-            req.on('error', function(e) {
-              console.log('problem with request: ' + e.message);
-            });
-
-            // write data to request body
-            req.write(strjoad);
-            req.end();
-
+            strjoad = makeajoad(data);
+            sendtoapi(strjoad);
           };
         };
     });
