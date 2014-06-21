@@ -1,22 +1,24 @@
 //setting shit up
   var util = require('util'),
       twitter = require('twitter'),
+      fs = require('fs'),
       _ = require('lodash'),
       http = require("http"),
       fs = require('fs');
-  var twit = new twitter({
-      consumer_key: 'Uui4NrkShX9x8zFoAENiggPlN',
-      consumer_secret: 'eIVwXceI57fJw3RWBxCOQRbFlEYS2W7zL7Q9P9l6yUgQxJzFt9',
-      access_token_key: '140177155-9OzRTJSd7GpW1P7WtInEqiIkUaEQ803hJ8aVDjqf',
-      access_token_secret: 'DM8OhkJPSObjsO2At0935PiJlizNqSJEIExYVAo7cHnp2'
-  });
+
   var options = {
-    host: '192.168.0.106',
-    port: 3000,
-    path: '/people',
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'}
-  };
+    'host': "192.168.0.106",
+    'port': 3000,
+    'path': "/people",
+    'method': "POST",
+    'headers': {'Content-Type': "application/json"}
+  }
+
+//read config stuff
+var opt = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+
+// open twitter stream
+  var twit = new twitter(opt);
 
   function sendtoapi(strjoad){
     var req = http.request(options, function(res) {
@@ -35,9 +37,12 @@
     // write data to request body
     req.write(strjoad);
     req.end();
-};
+  };
+
+
+
 //make a joad
-  function makeajoad(data){
+  function makeEntry(data){
     var joad = {};
     joad['story'] = (data.text);
     joad['imageUrl'] = _.pluck(data.entities.media, 'media_url')[0];
@@ -66,7 +71,7 @@ twit.stream('statuses/filter', {track:'selfie'}, function(stream) {
         if(!data.retweeted_status){
           if(data.entities.media && !(_.isUndefined(_.pluck(data.entities.media, 'media_url')))) {
             // options.headers['Content-Length'] = strjoad.length;
-            strjoad = makeajoad(data);
+            strjoad = makeEntry(data);
             sendtoapi(strjoad);
             writeajoad(strjoad);
           };
