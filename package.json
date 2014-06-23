@@ -1,7 +1,7 @@
 {
-  "name": "tagthejoads",
+  "name": "sluicebox.js",
   "version": "0.0.0",
-  "description": "joads joads joads",
+  "description": "filter tweets from twitter stream",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/People-Watching/tagthejoads.git"
+    "url": "https://github.com/People-Watching/sluicebox.js.git"
   },
   "author": "neeraj",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/People-Watching/tagthejoads/issues"
+    "url": "https://github.com/People-Watching/sluicebox.js/issues"
   },
-  "homepage": "https://github.com/People-Watching/tagthejoads",
+  "homepage": "https://github.com/People-Watching/sluicebox.js",
   "dependencies": {
     "twitter": "^0.2.9",
     "lodash": "^2.4.1",
