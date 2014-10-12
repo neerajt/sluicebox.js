@@ -1,6 +1,6 @@
 //setting shit up
   var util = require('util'),
-      twitter = require('twitter'),
+      twitter = require('ntwitter'),
       _ = require('lodash'),
       http = require("http"),
       fs = require('fs');
@@ -36,12 +36,13 @@
 twit.stream('statuses/filter', {track:st.search_terms}, function(stream) {
     stream.on('data', function(data) {
         if(!data.retweeted_status){
-//          if(data.entities.media && !(_.isUndefined(_.pluck(data.entities.media, 'media_url')))) {
+//          if(data.entities.media &&
+//            !(_.isUndefined(_.pluck(data.entities.media, 'media_url')))) {
             // options.headers['Content-Length'] = strtweetline.length;
             strtweetline = makeEntry(data);
             writeatweetline(strtweetline);
-//          };
-        };
+          };
+//        };
     });
 
     // Disconnect stream after five seconds
