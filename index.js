@@ -6,74 +6,44 @@
       http = require("http"),
       fs = require('fs');
 
-  var options = {
-    'host': "192.168.0.106",
-    'port': 3000,
-    'path': "/people",
-    'method': "POST",
-    'headers': {'Content-Type': "application/json"}
-  }
-
 //read config stuff
-var opt = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+  var opt = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
 // open twitter stream
   var twit = new twitter(opt);
 
-  function sendtoapi(strjoad){
-    var req = http.request(options, function(res) {
-      console.log('STATUS: ' + res.statusCode);
-      console.log('HEADERS: ' + JSON.stringify(res.headers));
-      res.setEncoding('utf8');
-      res.on('data', function (chunk) {
-        console.log('BODY: ' + chunk);
-      });
-    });
-
-    req.on('error', function(e) {
-      console.log('problem with request: ' + e.message);
-    });
-
-    // write data to request body
-    req.write(strjoad);
-    req.end();
-  };
-
-
-
-//make a joad
+//make a tweetline
   function makeEntry(data){
-    var joad = {};
-    joad['story'] = (data.text);
-    joad['imageUrl'] = _.pluck(data.entities.media, 'media_url')[0];
-    joad['location'] = {'time':(new Date(data.created_at)).toISOString(), 'latitude':5.0, 'longitude':23.0};
-    joad['tags'] = ['joads'];
-    // joad['tags'] = _.pluck(data.entities.hashtags[0], 'text');
-    var strjoad = JSON.stringify(joad);
-    console.log(strjoad);
-    console.log(strjoad.length);
-    return strjoad;
+    var tweetline = {};
+    tweetline['story'] = (data.text);
+    tweetline['imageUrl'] = _.pluck(data.entities.media, 'media_url')[0];
+    tweetline['location'] = {'time':(new Date(data.created_at)).toISOString(), 'latitude':5.0, 'longitude':23.0};
+    tweetline['tags'] = ['tweetlines'];
+    // tweetline['tags'] = _.pluck(data.entities.hashtags[0], 'text');
+    var strtweetline = JSON.stringify(tweetline);
+    console.log(strtweetline);
+    console.log(strtweetline.length);
+    return strtweetline;
   }
 
-//write a joad
-  function writeajoad(strjoad){
-  fs.appendFile("myJoads.txt", strjoad + "\n", function(err) {
+//write a tweetline
+  function writeatweetline(strtweetline){
+  fs.appendFile("my-tweetsz.txt", strtweetline + "\n", function(err) {
     if(err) {
-        console.log(err);
+	console.log(err);
     } else {
-        console.log("The file was saved!");
+	console.log("The file was saved!");
     }
   });
-  }
+}
 
-twit.stream('statuses/filter', {track:'selfie'}, function(stream) {
+twit.stream('statuses/filter', {track:'depression, depressed'}, function(stream) {
     stream.on('data', function(data) {
         if(!data.retweeted_status){
           if(data.entities.media && !(_.isUndefined(_.pluck(data.entities.media, 'media_url')))) {
-            // options.headers['Content-Length'] = strjoad.length;
-            strjoad = makeEntry(data);
-            sendtoapi(strjoad);
-            writeajoad(strjoad);
+            // options.headers['Content-Length'] = strtweetline.length;
+            strtweetline = makeEntry(data);
+            writeatweetline(strtweetline);
           };
         };
     });
@@ -81,17 +51,4 @@ twit.stream('statuses/filter', {track:'selfie'}, function(stream) {
     // Disconnect stream after five seconds
     setTimeout(stream.destroy, 120000);
 });
-
-
-// {
-//     "name" : "Jane Doe",
-//     "tags" : [ "homeless", "devloper", "veteran" ],
-//     "story" : "Jane worked for Silicon Graphics, and then was foreced out of her house.",
-//     "location" : {
-//                     "time" : <ISO 8601 timestamp>,
-//                     "latitude" : -54.34532323,
-//                     "longitude" : 23.4242122
-//                  }
-//     "image" : "http://localhost:3000/sad_sgi_engineer.jpeg"
-// }
 
